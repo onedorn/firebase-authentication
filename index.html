@@ -138,11 +138,11 @@
    firebase.initializeApp(firebaseConfig);
 
    // Make auth and firestore references
-   const db = firebase.auth();
+   const auth = firebase.auth();
    const db = firebase.firestore();
 
    //  Update firestore settings
-   db.settings( {timestampsInSnapshots: true} );
+   // db.settings( {timestampsInSnapshots: true} );
 
    </script>
    
