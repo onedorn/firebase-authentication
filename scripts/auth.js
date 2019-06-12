@@ -1,86 +1,79 @@
-// Listen for auth status changes
+// listen for auth status changes
 auth.onAuthStateChanged(user => {
-    console.log(user);
-    
-    if(user) {
+    if (user) {
         db.collection('guides').onSnapshot(snapshot => {
             setUpGuides(snapshot.docs);
             setupUi(user);
-        })
+        }, err => console.log(err.message));
     } else {
         setupUi();
-        setUpGuides([]);        
+        setUpGuides([]);
     }
 });
 
-// Create new guide
+// create new guide
 const createForm = document.querySelector('#create-form');
-
 createForm.addEventListener('submit', (e) => {
     e.preventDefault();
-
     db.collection('guides').add({
-        title: createForm['title'].value,
-        content: createForm['content'].value
+        title: createForm.title.value,
+        content: createForm.content.value
     }).then(() => {
-        // close modal and reset form
+    // close the create modal & reset form
         const modal = document.querySelector('#modal-create');
-        M. Modal.getInstance(modal).close();
+        M.Modal.getInstance(modal).close();
         createForm.reset();
     }).catch(err => {
         console.log(err.message);
-        
-    })
-})
+    });
+});
 
-
-// Sign Up 
+// signup
 const signupForm = document.querySelector('#signup-form');
-
 signupForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    // Get users info
+    // get user info
     const email = signupForm['signup-email'].value;
     const password = signupForm['signup-password'].value;
 
-    // Sign up the user
-    auth.createUserWithEmailAndPassword(email, password)
-        .then(cred => {
-            const modal = document.querySelector('#modal-signup');
-            M. Modal.getInstance(modal).close();
-            signupForm.reset();
-        })
+    // sign up the user & add firestore data
+    auth.createUserWithEmailAndPassword(email, password).then(cred => {
+        return db.collection('users').doc(cred.user.uid).set({
+        bio: signupForm['signup-bio'].value
+        });
+    }).then(() => {
+        // close the signup modal & reset form
+        const modal = document.querySelector('#modal-signup');
+        M.Modal.getInstance(modal).close();
+        signupForm.reset();
+        });
+    });
 
-})
-
-// Logout the users
+// logout
 const logout = document.querySelector('#logout');
 
-logout.addEventListener('click', (e) => {
+    logout.addEventListener('click', (e) => {
     e.preventDefault();
-
     auth.signOut();
-})
+    });
 
-
-// Login form
+// login
 const loginForm = document.querySelector('#login-form');
 loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    // Get user info
-    const email = loginForm['login-email'].value;
-    const password = loginForm['login-password'].value;
+// get user info
+const email = loginForm['login-email'].value;
+const password = loginForm['login-password'].value;
 
-    auth.signInWithEmailAndPassword(email, password)
-        .then(cred => {
-            // Close login modal and reset window
-            const modal = document.querySelector('#modal-login');
-            M. Modal.getInstance(modal).close();
-            loginForm.reset();
-            
-        })
+// log the user in
+auth.signInWithEmailAndPassword(email, password)
+    .then((cred) => {
+        // close the signup modal & reset form
+        const modal = document.querySelector('#modal-login');
+        M.Modal.getInstance(modal).close();
+        loginForm.reset();
+    });
 
-})
-
+});
