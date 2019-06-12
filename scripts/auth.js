@@ -9,6 +9,23 @@ auth.onAuthStateChanged(user => {
         setupUi();
         setUpGuides([]);        
     }
+});
+
+// Create new guide
+const createForm = document.querySelector('#create-form');
+
+createForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    db.collection('guides').add({
+        title: createForm['title'].value,
+        content: createForm['content'].value
+    }).then(() => {
+        // close modal and reset form
+        const modal = document.querySelector('#modal-create');
+        M. Modal.getInstance(modal).close();
+        createForm.reset();
+    })
 })
 
 
