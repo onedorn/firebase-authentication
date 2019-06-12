@@ -1,7 +1,7 @@
 // Listen for auth status changes
 auth.onAuthStateChanged(user => {
     if(user) {
-        db.collection('guides').get().then(snapshot => {
+        db.collection('guides').onSnapshot(snapshot => {
             setUpGuides(snapshot.docs);
             setupUi(user);
         })
@@ -25,6 +25,9 @@ createForm.addEventListener('submit', (e) => {
         const modal = document.querySelector('#modal-create');
         M. Modal.getInstance(modal).close();
         createForm.reset();
+    }).catch(err => {
+        console.log(err.message);
+        
     })
 })
 
